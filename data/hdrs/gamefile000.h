@@ -1,0 +1,6 @@
+#ifndef GAMEFILE000_H_INCLUDED
+#define GAMEFILE000_H_INCLUDED
+ 
+void gamefile000();
+ 
+#endif // GAMEFILE000_H_INCLUDED

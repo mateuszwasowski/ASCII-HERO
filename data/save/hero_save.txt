@@ -1,0 +1,24 @@
+                
+     \\////     
+     | . .|     
+     [  _ ]     
+     /  : \     
+     |  : )     
+     ==  ==     
+________________
+LEVEL:HP:POWER:DODGE:NAME:EXP:NEXTEXP:HERO_Y:HERO_X:SAVE:INVENTORY
+3
+4
+1
+0
+Test
+30
+60
+10
+19
+gamefile000
+
+________________
+max 16 char.
+
+THIS IS YOUR HERO SAVE FILE!!

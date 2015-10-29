@@ -1,0 +1,798 @@
+#include <iostream>
+#include <fstream>
+#include <conio.h>
+#include <vector>
+#include <Windows.h>
+#include <cstdlib>
+#include <ctime>
+
+#include "../hdrs/attack.h"
+#include "../hdrs/heroscreen.h"
+#include "../hdrs/gamefile003.h"
+
+
+using namespace std;
+
+string intToStr10(int n)
+{
+     string tmp, ret;
+     if(n < 0) {
+      ret = "-";
+      n = -n;
+     }
+     do {
+      tmp += n % 10 + 48;
+      n -= n % 10;
+     }
+     while(n /= 10);
+     for(int i = tmp.size()-1; i >= 0; i--)
+      ret += tmp[i];
+     return ret;
+}
+
+void gamefile005(){
+	
+	fstream map, hero_save, film1, film2, film3, film4, film5;
+	ofstream temp;
+	vector <string> cord_y_x;
+	vector <string> save_y_x;
+	string temp_line;
+	unsigned char key, temp_key;
+	unsigned char hero = '@';
+	int hero_y = 0, hero_x = 0, temp_random = 1, fled_int = 0, int_lvl, lvl=0, exp = 0, int_exp=0, popuptext=0, int_nextexp = 0;
+	int way, temp_int;
+	
+	bool level_up  = false;
+	bool killed = false;
+	bool fled = false;
+
+	
+	map.open( "data/maps/map006.txt", ios::in | ios::out );
+	hero_save.open( "data/save/hero_save.txt", ios::in | ios:: out );
+	temp.open( "data/save/temp.txt", ios::in | ios::out | ofstream::trunc);
+	
+	film1.open( "data/animations/theend1.txt", ios::in | ios::out );
+	film2.open( "data/animations/theend2.txt", ios::in | ios::out );
+	film3.open( "data/animations/theend3.txt", ios::in | ios::out );
+	film4.open( "data/animations/theend4.txt", ios::in | ios::out );
+	film5.open( "data/animations/theend5.txt", ios::in | ios::out );
+	
+	system("CLS");
+	
+	struct stats{
+	
+		string lvl;  // save_y_x [9]
+		string hp; // save_y_x [10]
+		string power; // save_y_x [11]
+		string dodge; // save_y_x [12]
+		string name;  //save_y_x [13] 
+		string exp;   //save_y_x [14] 
+		string nextexp;  //save_y_x [15] 
+		string hero_y;   //save_y_x [16] 
+		string hero_x;  //save_y_x [17] 
+		string save;   //save_y_x [18] 
+		string inventory;  //save_y_x [19] 
+	};
+	
+	stats h;
+	
+	if ( hero_save.good() == true ){  //wczytanie pozycji hero z pliku hero_save.txt oraz zapisanie aktualnej mapy
+		
+		for ( int  i = 0 ; i < 24 ; i ++){
+			
+			getline( hero_save , temp_line );
+			
+			save_y_x.push_back(temp_line);
+			
+			if ( i == 18 ){
+				save_y_x[i] = "gamefile005";
+
+			}
+			else if ( i == 16 ){
+				
+				hero_y = atoi(temp_line.c_str());
+				
+			}
+			else if ( i == 17 ){
+				
+				hero_x  = atoi(temp_line.c_str());
+				
+			}
+			else if ( i == 9 ){
+				
+				lvl = atoi(temp_line.c_str());
+
+			}
+			else if ( i == 14){
+				exp = atoi(temp_line.c_str());
+			}
+			else if ( i == 19 ){
+				h.inventory = temp_line;
+			}
+		}
+		
+		
+	}
+	else {
+		
+		cout << "ERROR. Can't open hero_save.txt file!";
+		key == getch();
+		
+	}
+	
+	if (map.good() == true){
+		
+			
+			
+		
+		//  WCZYTANIE MAPY Z PLIKU I PRZEPISANIE JEJ NA CORDY PRZY POMOCY VECTORA STRINGOW
+		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		
+		while(map.eof() != true){
+			
+			getline( map , temp_line );
+			
+			cord_y_x.push_back(temp_line);
+			
+		}
+		
+		temp_line = " ";
+		
+		cord_y_x.push_back(temp_line); //dodatkowa linia na wszelkie komentarze
+		
+		temp_key = cord_y_x[hero_y][hero_x]; // zapisuje w temp_key znak na którym stoi nasz hero
+		
+		cord_y_x[hero_y][hero_x] = hero; //wklejenie herosa na mape
+		
+		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		
+		while ( key != 8 ){  //backspace
+		
+			if(popuptext == 0){
+				
+				level_up = false;
+				killed = false;
+				fled = false;
+				
+			}
+			
+			system("CLS");
+			
+			// DRUKUJE MAPE
+			//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+			
+			
+			for( int i = 0 ; i <= 20; i ++){
+			
+			cout << cord_y_x[i] << endl;
+			
+			}
+			
+			//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+			
+			key = getch(); // pobieranie klawisza 
+		   
+		    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ KLAWISZ W 
+		    
+			if ( key == 'w' || key == 'W'){
+				
+				if ( cord_y_x[hero_y-1][hero_x] == '-' || cord_y_x[hero_y-1][hero_x] == '*' || cord_y_x[hero_y-1][hero_x] == '|' ){
+					
+					//przemieszczenie herosa
+					
+					cord_y_x[20] = "I must battle the Frog King to rescue Ann!";
+					cord_y_x[hero_y][hero_x] = temp_key;
+					hero_y = hero_y-1;
+					temp_key = cord_y_x[hero_y][hero_x];
+					cord_y_x[hero_y][hero_x] = hero;
+					
+					// |||||||||||||||||||||||||||||||||||||||||||||||| //zapisywanie pozycji herosa w hero_save.txt
+				
+					hero_save.clear();
+					hero_save.seekg( 0, ios::beg );
+					hero_save.close();
+   					temp.close();
+    				remove("data/save/hero_save.txt"); 
+    				rename("data/save/temp.txt","data/save/hero_save.txt");
+    				hero_save.open( "data/save/hero_save.txt", ios::in | ios:: out );
+					temp.open( "data/save/temp.txt", ios::in | ios::out | ofstream::trunc);
+					
+					for ( int i = 0 ; i < 24 ; i++ ){ 
+						
+						if ( i == 16 ){
+							
+							save_y_x[i] = intToStr10 (hero_y);
+							
+						}
+						else if ( i == 17 ){
+							
+							//nic siê nie zmienia
+							
+						}
+						
+						
+						hero_save << save_y_x[i] <<endl;
+					}
+					
+					
+					// ||||||||||||||||||||||||||||||||||||||||||||||||
+					
+					//dodatkowe warunki
+					
+					if(hero_y >= 10 ){
+							
+							attack();
+							
+							fled = true;
+							popuptext = 4;
+							
+							hero_save.clear();
+							hero_save.seekg( 0, ios::beg );
+							
+							for ( int i = 0 ; i < 24 ; i++ ){  //sprawdzanie czy zwiêkszy³ siê lvl podczas walki		
+								getline(hero_save, temp_line);
+								
+								if (i == 15){
+									
+									int_nextexp = atoi(temp_line.c_str());
+									save_y_x[15] = temp_line;
+									
+								}
+								if ( i == 14){
+									int_exp = atoi(temp_line.c_str());
+									save_y_x[14] = temp_line;
+								}
+							}
+							
+							if (int_exp > int_nextexp){
+								
+								lvl = int_lvl;
+								level_up=true;
+								killed = false;
+								fled = false;
+								
+							}
+							else if ( exp < int_exp){
+								
+								exp = int_exp;
+								killed = true;
+								fled = false;
+								
+							}
+
+						
+							
+					}
+					
+					if( temp_key == '|' ){
+						
+						cord_y_x[20] = "I must battle the Frog King to rescue Ann!";
+		
+					}	
+				}
+				else if ( cord_y_x[hero_y-1][hero_x] == ' '){
+					
+					hero_y = hero_y + 17;
+					
+					
+					// |||||||||||||||||||||||||||||||||||||||||||||||| //zapisywanie pozycji herosa w hero_save.txt
+				
+					hero_save.clear();
+					hero_save.seekg( 0, ios::beg );
+					hero_save.close();
+   					temp.close();
+    				remove("data/save/hero_save.txt"); 
+    				rename("data/save/temp.txt","data/save/hero_save.txt");
+    				hero_save.open( "data/save/hero_save.txt", ios::in | ios:: out );
+					temp.open( "data/save/temp.txt", ios::in | ios::out | ofstream::trunc);
+					
+					for ( int i = 0 ; i < 24 ; i++ ){ 
+						
+						if ( i == 16 ){
+							
+							save_y_x[i] = intToStr10 (hero_y);
+							
+						}
+						else if ( i == 17 ){
+							
+						  save_y_x[i] = intToStr10 (hero_x);
+							
+						}
+						
+						
+						hero_save << save_y_x[i] <<endl;
+					}
+					
+					
+					// ||||||||||||||||||||||||||||||||||||||||||||||||
+					
+					way = 1;
+					
+					break;
+				
+				}
+				else {
+					
+					cord_y_x[20] = "Hmm, I have to find some other way.";
+				
+				}
+			}
+			
+			//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ KLAWISZ S 
+			
+			else if ( key == 's' || key == 'S' ){
+				
+				if ( cord_y_x[hero_y+1][hero_x] == '-' || cord_y_x[hero_y+1][hero_x] == '*' || cord_y_x[hero_y+1][hero_x] == '|' ){
+					
+					//przemieszczenie herosa
+					
+					cord_y_x[20] =  "I must battle the Frog King to rescue Ann!";
+					cord_y_x[hero_y][hero_x] = temp_key;
+					hero_y = hero_y+1;
+					temp_key = cord_y_x[hero_y][hero_x];
+					cord_y_x[hero_y][hero_x] = hero;
+					
+					// |||||||||||||||||||||||||||||||||||||||||||||||| //zapisywanie pozycji herosa w hero_save.txt
+				
+					hero_save.clear();
+					hero_save.seekg( 0, ios::beg );
+					hero_save.close();
+   					temp.close();
+    				remove("data/save/hero_save.txt"); 
+    				rename("data/save/temp.txt","data/save/hero_save.txt");
+    				hero_save.open( "data/save/hero_save.txt", ios::in | ios:: out );
+					temp.open( "data/save/temp.txt", ios::in | ios::out | ofstream::trunc);
+					
+					for ( int i = 0 ; i < 24 ; i++ ){  
+						
+						
+						if ( i == 16 ){	
+						
+							save_y_x[i] = intToStr10 (hero_y);
+							
+						}
+						else if ( i == 17 ){
+							
+							//nic siê nie zmienia
+							
+						}
+						
+						hero_save << save_y_x[i] <<endl;
+					}
+					
+					// ||||||||||||||||||||||||||||||||||||||||||||||||
+					
+					
+					//dodatkowe warunki
+					
+				if(hero_y >= 10 ){
+							
+							attack();
+							
+							fled = true;
+							popuptext = 4;
+							
+							hero_save.clear();
+							hero_save.seekg( 0, ios::beg );
+							
+							for ( int i = 0 ; i < 24 ; i++ ){  //sprawdzanie czy zwiêkszy³ siê lvl podczas walki		
+								getline(hero_save, temp_line);
+								
+								if (i == 15){
+									
+									int_nextexp = atoi(temp_line.c_str());
+									save_y_x[15] = temp_line;
+									
+								}
+								if ( i == 14){
+									int_exp = atoi(temp_line.c_str());
+									save_y_x[14] = temp_line;
+								}
+							}
+							
+							if (int_exp > int_nextexp){
+								
+								lvl = int_lvl;
+								level_up=true;
+								killed = false;
+								fled = false;
+								
+							}
+							else if ( exp < int_exp){
+								
+								exp = int_exp;
+								killed = true;
+								fled = false;
+								
+					}
+					}
+					if( temp_key == '|' ){
+						
+						cord_y_x[20] = "I must battle the Frog King to rescue Ann!";
+						
+					}	
+				}
+				else {
+					
+					cord_y_x[20] = "Hmm, I have to find some other way.";
+				
+				}
+			}
+			
+			//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ KLAWISZ A
+			
+			else if ( key == 'a' || key == 'A'){
+				
+				if ( cord_y_x[hero_y][hero_x-1] == '-' || cord_y_x[hero_y][hero_x-1] == '*' || cord_y_x[hero_y][hero_x-1] == '|' ){
+					
+					//przemieszczenie herosa
+					
+					cord_y_x[20] =  "I must battle the Frog King to rescue Ann!";
+					cord_y_x[hero_y][hero_x] = temp_key;
+					hero_x = hero_x-1;
+					temp_key = cord_y_x[hero_y][hero_x];
+					cord_y_x[hero_y][hero_x] = hero;
+					
+					// |||||||||||||||||||||||||||||||||||||||||||||||| //zapisywanie pozycji herosa w hero_save.txt
+				
+					hero_save.clear();
+					hero_save.seekg( 0, ios::beg );
+					hero_save.close();
+   					temp.close();
+    				remove("data/save/hero_save.txt"); 
+    				rename("data/save/temp.txt","data/save/hero_save.txt");
+    				hero_save.open( "data/save/hero_save.txt", ios::in | ios:: out );
+					temp.open( "data/save/temp.txt", ios::in | ios::out | ofstream::trunc);
+					
+					for ( int i = 0 ; i < 24 ; i++ ){ 
+						
+						if ( i == 16 ){
+							
+							//nic siê nie zmienia
+							
+						}
+						else if ( i == 17 ){
+							
+						    save_y_x[i] = intToStr10 (hero_x);
+							
+						}
+						
+						hero_save << save_y_x[i] << endl;
+					}
+					
+					// ||||||||||||||||||||||||||||||||||||||||||||||||
+					
+					
+					
+					//dodatkowe warunki
+					
+					if(hero_y >= 10 ){
+							
+							attack();
+							
+							fled = true;
+							popuptext = 4;
+							
+							hero_save.clear();
+							hero_save.seekg( 0, ios::beg );
+							
+							for ( int i = 0 ; i < 24 ; i++ ){  //sprawdzanie czy zwiêkszy³ siê lvl podczas walki		
+								getline(hero_save, temp_line);
+								
+								if (i == 15){
+									
+									int_nextexp = atoi(temp_line.c_str());
+									save_y_x[15] = temp_line;
+									
+								}
+								if ( i == 14){
+									int_exp = atoi(temp_line.c_str());
+									save_y_x[14] = temp_line;
+								}
+							}
+							
+							if (int_exp > int_nextexp){
+								
+								lvl = int_lvl;
+								level_up=true;
+								killed = false;
+								fled = false;
+								
+							}
+							else if ( exp < int_exp){
+								
+								exp = int_exp;
+								killed = true;
+								fled = false;
+								
+					}
+					}
+					
+					if( temp_key=='|' ){
+						
+						cord_y_x[20] = "I must battle the Frog King to rescue Ann!";
+						
+					}
+				}
+				else {
+					
+					cord_y_x[20] = "Hmm, I have to find some other way.";
+				
+				}
+			}
+			
+			//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ KLAWISZ D			
+			
+			else if ( key == 'd' || key == 'D' ){
+				
+				if ( cord_y_x[hero_y][hero_x+1] == '-' || cord_y_x[hero_y][hero_x+1] == '*' || cord_y_x[hero_y][hero_x+1] == '|' ){
+					
+					//przemieszczenie herosa
+					
+					cord_y_x[20] = "I must battle the Frog King to rescue Ann!";
+					cord_y_x[hero_y][hero_x] = temp_key;
+					hero_x = hero_x+1;
+					temp_key = cord_y_x[hero_y][hero_x];
+					cord_y_x[hero_y][hero_x] = hero;
+					
+					// |||||||||||||||||||||||||||||||||||||||||||||||| //zapisywanie pozycji herosa w hero_save.txt
+				
+					hero_save.clear();
+					hero_save.seekg( 0, ios::beg );
+					hero_save.close();
+   					temp.close();
+    				remove("data/save/hero_save.txt"); 
+    				rename("data/save/temp.txt","data/save/hero_save.txt");
+    				hero_save.open( "data/save/hero_save.txt", ios::in | ios:: out );
+					temp.open( "data/save/temp.txt", ios::in | ios::out | ofstream::trunc);
+					
+					for ( int i = 0 ; i < 24 ; i++ ){ 
+						
+						if ( i == 16 ){
+							
+							//nic siê nie zmienia
+							
+						}
+						else if ( i == 17 ){
+							
+							save_y_x[i] = intToStr10 (hero_x);
+							
+						}
+						
+						hero_save << save_y_x[i] << endl;
+					}
+					
+					// ||||||||||||||||||||||||||||||||||||||||||||||||
+					
+					
+					//dodatkowe warunki				
+					
+					if(hero_y >= 10 ){
+							
+							attack();
+							
+							fled = true;
+							popuptext = 4;
+							
+							hero_save.clear();
+							hero_save.seekg( 0, ios::beg );
+							
+							for ( int i = 0 ; i < 24 ; i++ ){  //sprawdzanie czy zwiêkszy³ siê lvl podczas walki		
+								getline(hero_save, temp_line);
+								
+								if (i == 15){
+									
+									int_nextexp = atoi(temp_line.c_str());
+									save_y_x[15] = temp_line;
+									
+								}
+								if ( i == 14){
+									int_exp = atoi(temp_line.c_str());
+									save_y_x[14] = temp_line;
+								}
+							}
+							
+							if (int_exp > int_nextexp){
+								
+								lvl = int_lvl;
+								level_up=true;
+								killed = false;
+								fled = false;
+								
+							}
+							else if ( exp < int_exp){
+								
+								exp = int_exp;
+								killed = true;
+								fled = false;
+								
+					}
+					}
+					if( temp_key == '|' ){
+						
+						cord_y_x[20] = "I must battle the Frog King to rescue Ann!";
+						
+					}	
+				}
+				else {
+					
+					cord_y_x[20] = "Hmm, I have to find some other way.";
+				
+				}
+			}
+			
+			else if ( key == 'c' || key == 'C' ){ //character screen
+				
+				heroscreen();
+				
+				hero_save.clear();
+				hero_save.seekg( 0, ios::beg );
+					
+				for ( int i = 0 ; i < 24 ; i++ ){ 						
+				getline(hero_save, temp_line);
+								
+				if (i == 9){
+									
+				lvl = atoi(temp_line.c_str());
+				save_y_x[9] = temp_line;
+					
+				}
+				else if ( i == 11){
+					save_y_x[11]= temp_line;
+				}
+				else if (i == 10 ){
+					save_y_x[10]= temp_line;
+				}
+				else if ( i == 15){
+					save_y_x[15]= temp_line;
+				}
+				}
+				
+				
+			}
+			
+			//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+			
+			while( popuptext != 0 ) {
+					
+					
+					if ( killed == true || level_up == true ){
+						
+					if (film1.good() == true && film2.good() == true && film3.good() == true && film4.good() == true && film5.good() == true){
+					
+						
+					key = 0;
+					while (key != 13){
+						system("CLS");
+						
+						for ( int i = 0 ; i < 20 ; i ++){
+							getline (film4, temp_line);
+							cout <<temp_line<<endl;
+						}
+						
+						cout << "PRESS ENTER TO CONTINUE!";
+						key = getch();
+						
+					}
+					key = 0;
+					while (key != 13){
+						system("CLS");
+						
+						for ( int i = 0 ; i < 20 ; i ++){
+							getline (film5, temp_line);
+							cout <<temp_line<<endl;
+						}
+						
+						cout << "PRESS ENTER TO CONTINUE!";
+						key = getch();
+						
+						
+					}
+					
+					system("CLS");
+					
+					while (key != 8 ){
+		
+						for(int i = 0; i < 20; i++){
+							
+							if ( temp_int == 1 ){
+							
+							getline( film1, temp_line );
+							cout << temp_line << endl;
+							
+							}
+							else if( temp_int == 2 || temp_int == 4 ){
+								
+							getline( film2, temp_line );
+							cout << temp_line << endl;
+							
+							}
+							else if( temp_int == 3 ){
+								
+							getline( film3, temp_line );
+							cout << temp_line << endl;
+							
+							}
+						}
+						
+						Sleep(300); //nowa klatka animacji co 300ms
+						system("CLS");
+						
+						//zmienianie klatek 
+						
+						if ( temp_int == 1 ){ 
+							temp_int = 2;
+						}
+						else if ( temp_int == 2 ){
+							temp_int = 3;	
+						}
+						else if ( temp_int == 3 ){	
+							temp_int = 4;	
+						}
+						else {
+							temp_int = 1;
+						}
+						
+						//zerowanie miejsca w którym jest aktualnie we wczytywanej mapie
+						film1.clear();
+						film1.seekg( 0, ios::beg );
+						film2.clear();
+						film2.seekg( 0, ios::beg );
+						film3.clear();
+						film3.seekg( 0, ios::beg );
+						
+						}
+					}
+					else{
+						cout << "ERROR. Can't open theend animation files!";
+						key = getch();
+					}	
+					
+					
+						
+					}
+					else if (fled == true) {
+						
+				
+					cord_y_x[20] = "You have successfully fled!";
+					popuptext--;
+					break; 
+					
+					}
+
+			}
+		
+			
+			
+			
+			//opóŸnienie w odswiezaniu ekranu
+			if(temp_key == '|'){	
+				Sleep(50);		
+			}
+			else {	
+			Sleep(100);
+			}
+			
+		} //koniec funkcji while
+		
+		map.close();
+		
+	}//koniec funkcji if(map.good() == true)
+	else {
+		
+	cout << "ERROR. Can't open map006.txt file!";
+	key == getch();
+	
+	}
+	
+	if (way == 1){
+	gamefile003();
+	}
+	else if (way == 2){
+	
+	}
+	
+}
+
+
+

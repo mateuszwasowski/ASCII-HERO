@@ -3,6 +3,8 @@ An RPG C++ written game, made in 2013.
 
 v0.18, created by Mateusz Wąsowski
 
+I wrote this game after 3 months of learning C++, so the quality of code is poor to say at least.
+
 
 IF YOU DIE , DO NOT WORRY, RESTART THE GAME 
 AND CLICK CONTINUE, YOU WILL BE TAKEN TO THE

@@ -1,33 +1,8 @@
 # ASCII-HERO
 An RPG C++ written game, made in 2013.
 
-----------------------------------------
---AAAAAAAA--SSSSSSSS--CCCCCCCC--II--II--
---AA----AA--SS--------CC--------II--II--
---AA----AA--SS--------CC--------II--II--
---AA----AA--SS--------CC--------II--II--
---AA----AA--SS--------CC--------II--II--
---AAAAAAAA--SSSSSSSS--CC--------II--II--
---AA----AA--------SS--CC--------II--II--
---AA----AA--------SS--CC--------II--II--
---AA----AA--------SS--CC--------II--II--
---AA----AA--SSSSSSSS--CCCCCCCC--II--II--
-----------------------------------------
-----------------------------------------
---HH----HH--EEEEEEEE--RRRRRR----OOOOOO--
---HH----HH--EE--------RR----RR--OO--OO--
---HH----HH--EE--------RR----RR--OO--OO--
---HH----HH--EE--------RR----RR--OO--OO--
---HH----HH--EE--------RR----RR--OO--OO--
---HHHHHHHH--EEEEEEEE--RRRRRR----OO--OO--
---HH----HH--EE--------RR----RR--OO--OO--
---HH----HH--EE--------RR----RR--OO--OO--
---HH----HH--EE--------RR----RR--OO--OO--
---HH----HH--EEEEEEEE--RR----RR--OOOOOO--
-----------------------------------------
-----------------------------------------
---v0.18----created by Mateusz W¹sowski--
-----------------------------------------
+v0.18, created by Mateusz Wąsowski
+
 
 IF YOU DIE , DO NOT WORRY, RESTART THE GAME 
 AND CLICK CONTINUE, YOU WILL BE TAKEN TO THE
